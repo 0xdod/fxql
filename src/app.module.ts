@@ -3,8 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import dataSource from './config/datasource';
-import { FxqlModule } from './fxql/fxql.module';
+import dataSource from './common/config/data_source';
+import { FxqlModule } from './modules/fxql/fxql.module';
 
 @Module({
   imports: [
