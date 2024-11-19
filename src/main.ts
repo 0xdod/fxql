@@ -2,6 +2,7 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import * as dotenv from 'dotenv';
 import { AppModule } from './app.module';
+import { configureSwagger } from './common/config/swagger';
 
 dotenv.config();
 
@@ -10,6 +11,8 @@ async function bootstrap() {
   const logger = new Logger('bootstrap');
 
   const port = process.env.PORT || 3000;
+
+  configureSwagger(app);
 
   await app.listen(port);
   logger.log(`***application listening on port ${port}***`);

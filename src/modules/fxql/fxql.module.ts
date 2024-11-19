@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FXQLStatement } from './entities/fxql_statement.entity';
-import { FxqlService } from './fxql.service';
+import { FXQLController } from './fxql.controller';
+import { FXQLService } from './fxql.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([FXQLStatement])],
-  providers: [FxqlService],
+  providers: [FXQLService],
+  controllers: [FXQLController],
 })
-export class FxqlModule {}
+export class FXQLModule {}
