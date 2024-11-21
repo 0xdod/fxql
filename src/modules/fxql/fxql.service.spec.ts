@@ -67,9 +67,7 @@ describe('FXQLService', () => {
         }[];
       }[] = [
         {
-          input: JSON.parse(
-            `{ "FXQL": "USD-GBP {\\n BUY 100\\n SELL 200\\n CAP 93800\\n}"}`,
-          ),
+          input: { FXQL: 'USD-GBP {\\n BUY 100\\n SELL 200\\n CAP 93800\\n}' },
           output: [
             {
               sourceCurrency: 'USD',
@@ -81,9 +79,7 @@ describe('FXQLService', () => {
           ],
         },
         {
-          input: JSON.parse(
-            `{ "FXQL": "USD-GBP {\\n BUY 1\\n SELL 0.04590\\n CAP 0\\n}"}`,
-          ),
+          input: { FXQL: 'USD-GBP {\\n BUY 1\\n SELL 0.04590\\n CAP 0\\n}' },
           output: [
             {
               sourceCurrency: 'USD',
@@ -96,9 +92,9 @@ describe('FXQLService', () => {
         },
 
         {
-          input: JSON.parse(`{
-            "FXQL": "USD-GBP {\\n  BUY 0.85\\n  SELL 0.90\\n  CAP 10000\\n}\\n\\nEUR-JPY {\\n  BUY 145.20\\n  SELL 146.50\\n  CAP 50000\\n}\\n\\nNGN-USD {\\n  BUY 0.0022\\n  SELL 0.0023\\n  CAP 2000000\\n}"
-          }`),
+          input: {
+            FXQL: 'USD-GBP {\\n  BUY 0.85\\n  SELL 0.90\\n  CAP 10000\\n}\\n\\nEUR-JPY {\\n  BUY 145.20\\n  SELL 146.50\\n  CAP 50000\\n}\\n\\nNGN-USD {\\n  BUY 0.0022\\n  SELL 0.0023\\n  CAP 2000000\\n}',
+          },
           output: [
             {
               sourceCurrency: 'USD',
@@ -143,14 +139,14 @@ describe('FXQLService', () => {
         input: { FXQL: string };
       }[] = [
         {
-          input: JSON.parse(
-            `{ "FXQL": "USDT-ALGO {\\n BUY 100.100\\n SELL 200\\n CAP 93800.11\\n}"}`,
-          ),
+          input: {
+            FXQL: 'USDT-ALGO {\\n BUY 100.100\\n SELL 200\\n CAP 93800.11\\n}',
+          },
         },
         {
-          input: JSON.parse(`{
-            "FXQL": "usd-gbp {\\n  BUY 0.85\\n  SELL 0.90\\n  CAP 1000\\n}\\n\\nEUR-JPY {\\n  BUY 145.20\\n  SELL 146.50\\n  CAP 50000\\n}\\n\\nNGN-USD {\\n  BUY 0.0022\\n  SELL 0.0023\\n  CAP 2000000\\n}"
-          }`),
+          input: {
+            FXQL: 'usd-gbp {\\n  BUY 0.85\\n  SELL 0.90\\n  CAP 1000\\n}\\n\\nEUR-JPY {\\n  BUY 145.20\\n  SELL 146.50\\n  CAP 50000\\n}\\n\\nNGN-USD {\\n  BUY 0.0022\\n  SELL 0.0023\\n  CAP 2000000\\n}',
+          },
         },
       ];
 
