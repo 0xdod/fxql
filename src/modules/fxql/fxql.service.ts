@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { PageDto, PageQueryDto } from '../../common/dto/page.dto';
 import {
   FXQLStatementRegex,
+  MaxCurrencyPairRequests,
   SampleFXQLStatement,
 } from './constants/fxql.constant';
 import { CreateFXQLStatementDto } from './dto/fxql.dto';
@@ -71,6 +72,11 @@ export class FXQLService {
     const results = [];
 
     const currencyPairTokens = statement.split(/[A-Z]{3}-[A-Z]{3}/g).length - 1;
+
+    if (currencyPairTokens > MaxCurrencyPairRequests) {
+      throw new BadRequestException('Maximum of 1000 currency pairs allowed');
+    }
+
     const buyTokens = statement.split(/BUY/g).length - 1;
     const sellTokens = statement.split(/SELL/g).length - 1;
     const capTokens = statement.split(/CAP/g).length - 1;
@@ -94,6 +100,10 @@ export class FXQLService {
       currencyPairTokens === buyTokens &&
       currencyPairTokens === sellTokens &&
       currencyPairTokens === capTokens;
+
+    console.log(statement);
+    console.log(isValidStatement);
+    console.log(results);
 
     if (results.length === 0 || !isValidStatement) {
       throw new BadRequestException(
