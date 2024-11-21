@@ -5,7 +5,7 @@ import { CreateFXQLStatementDto } from './dto/fxql.dto';
 import { FXQLService } from './fxql.service';
 
 @ApiTags('FXQL Statements API')
-@Controller('fxql-statements')
+@Controller({ version: '1', path: 'fxql-statements' })
 export class FXQLController {
   constructor(private readonly fxqlService: FXQLService) {}
 
