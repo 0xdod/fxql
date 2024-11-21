@@ -1,8 +1,11 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PageDto, PageQueryDto } from 'src/common/dto/page.dto';
 import { Repository } from 'typeorm';
-import { FXQLStatementRegex } from './constants/fxql-regex.constant';
+import { PageDto, PageQueryDto } from '../../common/dto/page.dto';
+import {
+  FXQLStatementRegex,
+  SampleFXQLStatement,
+} from './constants/fxql.constant';
 import { CreateFXQLStatementDto } from './dto/fxql.dto';
 import { FXQLStatement } from './entities/fxql_statement.entity';
 
@@ -23,26 +26,28 @@ export class FXQLService {
     private readonly fxqlStatementRepo: Repository<FXQLStatement>,
   ) {}
 
-  async createStatement({
+  async createStatements({
     FXQL,
-  }: CreateFXQLStatementDto): Promise<FXQLStatement> {
-    const parsedStatement = this.parse(FXQL);
+  }: CreateFXQLStatementDto): Promise<FXQLStatement[]> {
+    const parsedStatements = this.parse(FXQL);
 
-    console.log(parsedStatement);
+    const fxqlStatements = [];
 
-    const existingStatement = await this.fxqlStatementRepo.findOneBy({
-      sourceCurrency: parsedStatement.sourceCurrency,
-      destinationCurrency: parsedStatement.destinationCurrency,
-    });
-
-    if (existingStatement) {
-      return this.fxqlStatementRepo.save({
-        ...existingStatement,
-        ...parsedStatement,
+    for (const parsedStatement of parsedStatements) {
+      const existingStatement = await this.fxqlStatementRepo.findOneBy({
+        sourceCurrency: parsedStatement.sourceCurrency,
+        destinationCurrency: parsedStatement.destinationCurrency,
       });
+
+      fxqlStatements.push(
+        this.fxqlStatementRepo.create({
+          ...(existingStatement ?? {}),
+          ...parsedStatement,
+        }),
+      );
     }
 
-    return this.fxqlStatementRepo.save(parsedStatement);
+    return this.fxqlStatementRepo.save(fxqlStatements);
   }
 
   async getStatements(
@@ -61,10 +66,16 @@ export class FXQLService {
     return new PageDto(result, count);
   }
 
-  parse(statement: string): ParsedFXQLStatement {
-    const match = FXQLStatementRegex.exec(statement);
+  parse(statement: string): ParsedFXQLStatement[] {
+    let match: RegExpExecArray | null;
+    const results = [];
 
-    if (match && match.groups) {
+    const currencyPairTokens = statement.split(/[A-Z]{3}-[A-Z]{3}/g).length - 1;
+    const buyTokens = statement.split(/BUY/g).length - 1;
+    const sellTokens = statement.split(/SELL/g).length - 1;
+    const capTokens = statement.split(/CAP/g).length - 1;
+
+    while ((match = FXQLStatementRegex.exec(statement)) !== null) {
       const [sourceCurrency, destinationCurrency] =
         match.groups.pair.split('-');
 
@@ -76,11 +87,20 @@ export class FXQLService {
         capAmount: parseInt(match.groups.cap, 10),
       };
 
-      return parsedData;
+      results.push(parsedData);
     }
 
-    throw new BadRequestException(
-      'invalid or malformed request, payload conform to this format: USD-GBP {\n BUY 100\n SELL 200\n CAP 93800\n}',
-    );
+    const isValidStatement =
+      currencyPairTokens === buyTokens &&
+      currencyPairTokens === sellTokens &&
+      currencyPairTokens === capTokens;
+
+    if (results.length === 0 || !isValidStatement) {
+      throw new BadRequestException(
+        `invalid FXQL statement. Expected format: ${SampleFXQLStatement}`,
+      );
+    }
+
+    return results;
   }
 }
