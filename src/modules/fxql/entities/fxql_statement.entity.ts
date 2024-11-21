@@ -11,8 +11,8 @@ export class FXQLStatement extends Base {
   destinationCurrency: string;
 
   @Column('decimal', {
-    precision: 10,
-    scale: 2,
+    precision: 19,
+    scale: 8,
     transformer: {
       to: (value: number) => value,
       from: (value: string) => parseFloat(value),
@@ -21,8 +21,8 @@ export class FXQLStatement extends Base {
   sellPrice: number;
 
   @Column('decimal', {
-    precision: 10,
-    scale: 2,
+    precision: 19,
+    scale: 8,
     transformer: {
       to: (value: number) => value,
       from: (value: string) => parseFloat(value),

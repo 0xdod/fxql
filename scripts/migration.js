@@ -10,7 +10,7 @@ if (!migrationName) {
 }
 
 const migrationsDir = 'src/migrations';
-const dataSource = 'src/config/data_source.ts';
+const dataSource = 'src/common/config/data_source.ts';
 
 const subcommandsMap = {
   'migration:generate': `ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate ${migrationsDir}/${migrationName} -d ${dataSource}`,

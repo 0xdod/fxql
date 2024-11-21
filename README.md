@@ -1,5 +1,21 @@
 # FXQL Statement Parser API
 
+## The Parser
+
+The purpose of this API is to parse FXQL statments. Valid FXQL statements have the form:
+
+```
+CURR1-CURR2 {
+ BUY {AMOUNT}
+ SELL {AMOUNT}
+ CAP {AMOUNT}
+}
+```
+
+The API uses regex to parse an input string in this format and return a valid FXQL statement if the input conforms to the constraints described above.
+
+The decision to use regex to parse the input is simply because of how easier it would be compared to writing a dedicated parser for the statements, although with this approach, detailed error reporting is sacrificed as it would be tedious to pinpoint exactly where the error occured and there is also a potential issue with scaling.
+
 ## Setup Instructions
 
 This project requires:

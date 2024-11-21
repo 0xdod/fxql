@@ -18,6 +18,8 @@ type ParsedFXQLStatement = {
   capAmount: number;
 };
 
+type CurrencyPair = `${string}-${string}`;
+
 @Injectable()
 export class FXQLService {
   private readonly logger = new Logger(FXQLService.name);
@@ -30,11 +32,11 @@ export class FXQLService {
   async createStatements({
     FXQL,
   }: CreateFXQLStatementDto): Promise<FXQLStatement[]> {
-    const parsedStatements = this.parse(FXQL);
+    const parsedStatments = this.parse(FXQL);
 
     const fxqlStatements = [];
 
-    for (const parsedStatement of parsedStatements) {
+    for (const parsedStatement of Object.values(parsedStatments)) {
       const existingStatement = await this.fxqlStatementRepo.findOneBy({
         sourceCurrency: parsedStatement.sourceCurrency,
         destinationCurrency: parsedStatement.destinationCurrency,
@@ -67,7 +69,7 @@ export class FXQLService {
     return new PageDto(result, count);
   }
 
-  parse(statement: string): ParsedFXQLStatement[] {
+  parse(statement: string): Record<CurrencyPair, ParsedFXQLStatement> {
     let match: RegExpExecArray | null;
     const results = [];
 
@@ -101,16 +103,20 @@ export class FXQLService {
       currencyPairTokens === sellTokens &&
       currencyPairTokens === capTokens;
 
-    console.log(statement);
-    console.log(isValidStatement);
-    console.log(results);
-
     if (results.length === 0 || !isValidStatement) {
       throw new BadRequestException(
         `invalid FXQL statement. Expected format: ${SampleFXQLStatement}`,
       );
     }
 
-    return results;
+    const parsedStatments: {
+      CurrencyPair?: ParsedFXQLStatement;
+    } = results.reduce((acc, statement) => {
+      const currencyPair: CurrencyPair = `${statement.sourceCurrency}-${statement.destinationCurrency}`;
+      acc[currencyPair] = statement;
+      return acc;
+    }, {});
+
+    return parsedStatments;
   }
 }
